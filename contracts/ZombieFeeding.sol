@@ -22,8 +22,31 @@ interface KittyInterface {
 }
 
 contract ZombieFeeding is ZombieFactory {
-  address public ckAddress = 0x06012c8cf97BEaD5deAe237070F9587f8E7A266d;
-  KittyInterface public kittyInterface = KittyInterface(ckAddress);
+  KittyInterface public kittyInterface;
+
+  /**
+   * @dev Changes and sets the address of the CryptoKitties smart contract
+   * @param _address The actual address of the deployed CryptoKitties smart contract
+   */
+  function setKittyContractAddress(address _address) external onlyOwner {
+    kittyInterface = KittyInterface(_address);
+  }
+
+  /**
+   * @dev Sets the readytime for the zombie before he can attack again
+   * @param _zombie A reference to the zombie
+   */
+  function _triggerCooldown(Zombie storage _zombie) internal {
+    _zombie.readyTime = uint32(block.timestamp + cooldownTime);
+  }
+
+  /**
+   * @dev Checks if the zombie is ready to attack
+   * @param _zombie A reference to the zombie
+   */
+  function _isReady(Zombie storage _zombie) internal view returns (bool) {
+    return _zombie.readyTime <= block.timestamp;
+  }
 
   /**
    * @dev Creates a new zombie from the zombieId and the DNA of a target

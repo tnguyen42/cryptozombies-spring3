@@ -6,10 +6,11 @@ describe("ZombieFactory", () => {
   let ZombieFactory;
   let zombieFactory;
   let user1;
+  let user2;
 
   beforeEach(async () => {
     ZombieFactory = await ethers.getContractFactory("ZombieFactory");
-    [user1] = await ethers.getSigners();
+    [user1, user2] = await ethers.getSigners();
 
     zombieFactory = await ZombieFactory.deploy();
   });
@@ -24,6 +25,11 @@ describe("ZombieFactory", () => {
 
   it("should not allow a player to create two zombies in a row", async () => {
     await zombieFactory.connect(user1).createRandomZombie("Jad");
+    await zombieFactory.connect(user2).createRandomZombie("Jad");
+
+    const zombies = await zombieFactory.getZombies();
+    expect(zombies.length).to.equal(2);
+
     await zombieFactory
       .connect(user1)
       .createRandomZombie("Jad")
